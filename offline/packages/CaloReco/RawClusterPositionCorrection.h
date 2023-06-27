@@ -78,6 +78,7 @@ class RawClusterPositionCorrection : public SubsysReco
   int bins_eta;
   int bins_phi;
   std::string calib_file;
+  int iEvent;
 };
 
 #endif

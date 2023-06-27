@@ -45,6 +45,7 @@ RawClusterPositionCorrection::RawClusterPositionCorrection(const std::string &na
   , bins_eta(384)
   , bins_phi(64)
   , calib_file("/gpfs/mnt/gpfs02/sphenix/user/anarde/data/calib/calib-combine.root")
+  , iEvent(0)
 {
   // SetDefaultParameters(_eclus_calib_params);
   // SetDefaultParameters(_ecore_calib_params);
@@ -130,9 +131,10 @@ int RawClusterPositionCorrection::InitRun(PHCompositeNode *topNode)
 
 int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
 {
-  if (Verbosity())
+  if (Verbosity() >= Fun4AllBase::VERBOSITY_SOME)
   {
-    std::cout << "Processing a NEW EVENT" << std::endl;
+    if(iEvent%100 == 0) std::cout << "Progress: " << iEvent << std::endl;
+    ++iEvent;
   }
 
   std::string rawClusNodeName = "CLUSTER_" + _det_name;
@@ -374,12 +376,8 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
     //   }
     // }
 
-    if ((phibin < 0 || etabin < 0) && Verbosity())
-    {
-      if (Verbosity())
-      {
-        std::cout << "couldn't recalibrate cluster, something went wrong??" << std::endl;
-      }
+    if ((phibin < 0 || etabin < 0) && Verbosity() >= Fun4AllBase::VERBOSITY_MORE) {
+      std::cout << "couldn't recalibrate cluster, something went wrong??" << std::endl;
     }
 
     float eclus_recalib_val = 1;
@@ -399,7 +397,7 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
     recalibcluster->set_ecore(cluster->get_ecore() / ecore_recalib_val);
     _recalib_clusters->AddCluster(recalibcluster);
 
-    if (Verbosity() && clus_energy > 1)
+    if (Verbosity() >= Fun4AllBase::VERBOSITY_EVEN_MORE && clus_energy > 1)
     {
       std::cout << "Input eclus cluster energy: " << clus_energy << std::endl;
       std::cout << "Recalib value: " << eclus_recalib_val << std::endl;
