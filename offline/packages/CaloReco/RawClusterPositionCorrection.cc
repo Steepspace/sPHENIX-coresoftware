@@ -37,8 +37,6 @@
 
 RawClusterPositionCorrection::RawClusterPositionCorrection(const std::string &name)
   : SubsysReco(std::string("RawClusterPositionCorrection_") + name)
-  // , _eclus_calib_params(std::string("eclus_params_") + name)
-  // , _ecore_calib_params(std::string("ecore_params_") + name)
   , _det_name(name)
   , nTowersPhi(256)
   , nTowersEta(96)
@@ -50,67 +48,11 @@ RawClusterPositionCorrection::RawClusterPositionCorrection(const std::string &na
   , h2NorthSector(0)
   , h2SouthSector(0)
 {
-  // SetDefaultParameters(_eclus_calib_params);
-  // SetDefaultParameters(_ecore_calib_params);
 }
 
 int RawClusterPositionCorrection::InitRun(PHCompositeNode *topNode)
 {
   CreateNodeTree(topNode);
-
-  // if (Verbosity())
-  // {
-  //   std::cout << "RawClusterPositionCorrection is running for clusters in the EMCal with eclus parameters:" << std::endl;
-  //   _eclus_calib_params.Print();
-
-  //   std::cout << "RawClusterPositionCorrection is running for clusters in the EMCal with ecore parameters:" << std::endl;
-  //   _ecore_calib_params.Print();
-  // }
-  // now get the actual number of bins in the calib file
-  // std::ostringstream paramname;
-  // paramname.str("");
-  // paramname << "number_of_bins";
-
-  //+1 because I use bins as the total number of bin boundaries
-  // i.e. 16 bins corresponds to 17 bin boundaries
-  // bins = _eclus_calib_params.get_int_param(paramname.str()) + 1;
-
-  // set bin boundaries
-
-  // for (int j = 0; j < bins; j++)
-  // {
-  //   binvals.push_back(0. + j * 2. / (float) (bins - 1));
-  // }
-
-  // for (int i = 0; i < bins - 1; i++)
-  // {
-  //   std::vector<double> dumvec;
-
-  //   for (int j = 0; j < bins - 1; j++)
-  //   {
-  //     std::ostringstream calib_const_name;
-  //     calib_const_name.str("");
-  //     calib_const_name << "recalib_const_eta"
-  //                      << i << "_phi" << j;
-  //     dumvec.push_back(_eclus_calib_params.get_double_param(calib_const_name.str()));
-  //   }
-  //   eclus_calib_constants.push_back(dumvec);
-  // }
-
-  // for (int i = 0; i < bins - 1; i++)
-  // {
-  //   std::vector<double> dumvec;
-
-  //   for (int j = 0; j < bins - 1; j++)
-  //   {
-  //     std::ostringstream calib_const_name;
-  //     calib_const_name.str("");
-  //     calib_const_name << "recalib_const_eta"
-  //                      << i << "_phi" << j;
-  //     dumvec.push_back(_ecore_calib_params.get_double_param(calib_const_name.str()));
-  //   }
-  //   ecore_calib_constants.push_back(dumvec);
-  // }
 
   h2NorthSector = new TH2F("h2NorthSector", "Cluster; towerid #eta; towerid #phi", bins_eta, 47.5, 95.5, bins_phi, -0.5, 7.5);
   h2SouthSector = new TH2F("h2SouthSector", "Cluster; towerid #eta; towerid #phi", bins_eta, -0.5, 47.5, bins_phi, -0.5, 7.5);
@@ -307,31 +249,6 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
 
     if(avgphi >= 255.5) avgphi -= bins_phi;
 
-    // returns angle in [-pi,pi]
-    // float alpha = atan2(y,x);
-
-    // convert [-pi,pi] -> [0,2pi]
-    // if(alpha < 0) alpha += 2*M_PI;
-
-    // convert [0,2pi] -> [0,256]
-    // float avgphi = alpha*nTowersPhi/(2*M_PI);
-
-    // if value is greater than 255.5 then wrap it back around
-    // convert [255.5, 256] -> [-0.5, 0]
-    // if(avgphi > nTowersPhi-0.5) avgphi -= nTowersPhi;
-
-    // if (avgphi < 0)
-    // {
-    //   avgphi += nphibin;
-    // }
-
-    // this determines the position of the cluster in the 2x2 block
-    // float fmodphi = fmod(avgphi, 2.);
-    // float fmodeta = fmod(avgeta, 2.);
-
-    // determine the bin number
-    // 2 is here since we divide the 2x2 block into 16 bins in eta/phi
-
     int etabin = -99;
     int phibin = -99;
 
@@ -344,67 +261,6 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
     }
     phibin = h2NorthSector->GetYaxis()->FindBin(avgphi)-1; // can use either h2NorthSector or h2SouthSector since both have the same phi binning
 
-    // determine the bin number in eta
-    // check if towerid is in the right half
-    // towerid: 47.5 -> calib: 0 and towerid: 95.5 -> calib: 383
-//    if(avgeta >= 47.5) {
-//        for(int i = 0; i < bins_eta; ++i) {
-//            if(avgeta >= 47.5 + i/8.0 && avgeta < 47.5 + (i+1)/8.0) {
-//                etabin = i;
-//                break;
-//            }
-//        }
-//    }
-//    // else towerid must be in the left half
-//    // towerid: -0.5 -> calib: 383 and towerid: 47.5 -> calib: 0
-//    else {
-//        for(int i = 0; i < bins_eta; ++i) {
-//            if(avgeta > 47.5 - (i+1)/8.0 && avgeta <= 47.5 - i/8.0 ) {
-//                etabin = i;
-//                break;
-//            }
-//        }
-//    }
-
-    // determine the bin number in phi
-    // return the edge case which is not checked in the loop below
-//    if(avgphi == 255.5) phibin = bins_phi-1;
-//
-//    else{
-//        // search for towerid within each sector and obtain the correct phibin relative to the sector
-//        for(int i = 0; i < 32; ++i) {
-//            float tl = 8*i-0.5;
-//            float th = 8*i+7.5;
-//
-//            if(avgphi >= tl && avgphi < th) {
-//                // find the calibration constant location
-//                for(int j = 0; j < bins_phi; ++j) {
-//                    if(avgphi >= tl + j/8.0 && avgphi < tl + (j+1)/8.0) {
-//                        phibin = j;
-//                        break;
-//                    }
-//                }
-//                break;
-//            }
-//        }
-//    }
-
-    // for (int j = 0; j < bins - 1; j++)
-    // {
-    //   if (fmodphi >= binvals.at(j) && fmodphi <= binvals.at(j + 1))
-    //   {
-    //     phibin = j;
-    //   }
-    // }
-
-    // for (int j = 0; j < bins - 1; j++)
-    // {
-    //   if (fmodeta >= binvals.at(j) && fmodeta <= binvals.at(j + 1))
-    //   {
-    //     etabin = j;
-    //   }
-    // }
-
     if ((phibin < 0 || etabin < 0) && Verbosity() >= Fun4AllBase::VERBOSITY_MORE) {
       std::cout << "couldn't recalibrate cluster, something went wrong??" << std::endl;
     }
@@ -413,8 +269,6 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
     float ecore_recalib_val = 1;
     if (phibin > -1 && etabin > -1)
     {
-        // eclus_recalib_val = eclus_calib_constants.at(etabin).at(phibin);
-        // ecore_recalib_val = ecore_calib_constants.at(etabin).at(phibin);
         if(avgeta < 47.5) {
             eclus_recalib_val = calib_constants_south[phibin][etabin];
             ecore_recalib_val = calib_constants_south[phibin][etabin];
@@ -490,42 +344,8 @@ void RawClusterPositionCorrection::CreateNodeTree(PHCompositeNode *topNode)
     PHIODataNode<PHObject> *clusterNode = new PHIODataNode<PHObject>(_recalib_clusters, ClusterCorrNodeName.c_str(), "PHObject");
     cemcNode->addNode(clusterNode);
   }
-
-  // put the recalib parameters on the node tree
-  // PHCompositeNode *parNode = dynamic_cast<PHCompositeNode *>(iter.findFirst("PHCompositeNode", "RUN"));
-  // assert(parNode);
-
-  // std::string paramNodeName = std::string("eclus_Recalibration_" + _det_name);
-  // std::string paramNodeName2 = std::string("ecore_Recalibration_" + _det_name);
-
-  // if (m_UseTowerInfo)
-  // {
-  //   paramNodeName = std::string("eclus_RecalibrationInfo_" + _det_name);
-  //   paramNodeName2 = std::string("ecore_RecalibrationInfo_" + _det_name);
-  // }
-
-  // _eclus_calib_params.SaveToNodeTree(parNode, paramNodeName);
-  // _ecore_calib_params.SaveToNodeTree(parNode, paramNodeName2);
 }
 int RawClusterPositionCorrection::End(PHCompositeNode * /*topNode*/)
 {
   return Fun4AllReturnCodes::EVENT_OK;
 }
-// void RawClusterPositionCorrection::SetDefaultParameters(PHParameters &param)
-// {
-//   param.set_int_param("number_of_bins", 17);
-
-//   std::ostringstream param_name;
-//   for (int i = 0; i < bins - 1; i++)
-//   {
-//     for (int j = 0; j < bins - 1; j++)
-//     {
-//       param_name.str("");
-//       param_name << "recalib_const_eta"
-//                  << i << "_phi" << j;
-
-//       // default to 1, i.e. no recalibration
-//       param.set_double_param(param_name.str(), 1.0);
-//     }
-//   }
-// }
