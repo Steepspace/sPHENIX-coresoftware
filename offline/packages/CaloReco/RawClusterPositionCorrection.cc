@@ -44,8 +44,11 @@ RawClusterPositionCorrection::RawClusterPositionCorrection(const std::string &na
   , nTowersEta(96)
   , bins_eta(384)
   , bins_phi(64)
-  , calib_file("/gpfs/mnt/gpfs02/sphenix/user/anarde/data/calib/calib-combine.root")
+  , calib_file_north("/sphenix/user/anarde/data/calib/calib-north.root")
+  , calib_file_south("/sphenix/user/anarde/data/calib/calib-south.root")
   , iEvent(0)
+  , h2NorthSector(0)
+  , h2SouthSector(0)
 {
   // SetDefaultParameters(_eclus_calib_params);
   // SetDefaultParameters(_ecore_calib_params);
@@ -109,8 +112,11 @@ int RawClusterPositionCorrection::InitRun(PHCompositeNode *topNode)
   //   ecore_calib_constants.push_back(dumvec);
   // }
 
-  TFile f(calib_file.c_str());
-  TNtuple* ntp_calib = (TNtuple*)f.Get("ntp_calib");
+  h2NorthSector = new TH2F("h2NorthSector", "Cluster; towerid #eta; towerid #phi", bins_eta, 47.5, 95.5, bins_phi, -0.5, 7.5);
+  h2SouthSector = new TH2F("h2SouthSector", "Cluster; towerid #eta; towerid #phi", bins_eta, -0.5, 47.5, bins_phi, -0.5, 7.5);
+
+  TFile f_north(calib_file_north.c_str());
+  TNtuple* ntp_calib = (TNtuple*)f_north.Get("ntp_calib");
   float calib_constant = 0;
   ntp_calib->SetBranchAddress("calib",&calib_constant);
 
@@ -122,9 +128,25 @@ int RawClusterPositionCorrection::InitRun(PHCompositeNode *topNode)
       ntp_calib->GetEntry(key);
       dumvec.push_back(calib_constant);
     }
-    calib_constants.push_back(dumvec);
+    calib_constants_north.push_back(dumvec);
   }
-  f.Close();
+  f_north.Close();
+
+  TFile f_south(calib_file_south.c_str());
+  ntp_calib = (TNtuple*)f_south.Get("ntp_calib");
+  ntp_calib->SetBranchAddress("calib",&calib_constant);
+
+  // Read in the calibration factors and store in the array
+  for(int i = 0; i < bins_phi; ++i) {
+    std::vector<float> dumvec;
+    for(int j = 0; j < bins_eta; ++j) {
+      int key = i*bins_eta+j;
+      ntp_calib->GetEntry(key);
+      dumvec.push_back(calib_constant);
+    }
+    calib_constants_south.push_back(dumvec);
+  }
+  f_south.Close();
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -184,7 +206,7 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
     std::cout << PHWHERE << ": Could not find node " << towergeomnodename << std::endl;
     return Fun4AllReturnCodes::ABORTEVENT;
   }
-  // const int nphibin = towergeom->get_phibins();
+  const int nphibin = towergeom->get_phibins();
 
   // loop over the clusters
   RawClusterContainer::ConstRange begin_end = rawclusters->getClusters();
@@ -250,55 +272,53 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
     // weighted eta and phi position of the cluster
 
     float etamult = 0;
-    float etasum  = 0;
-    // float phimult = 0;
-    // float phisum  = 0;
-    float x       = 0;
-    float y       = 0;
+    float etasum = 0;
+    float phimult = 0;
+    float phisum = 0;
 
-    for (int j = 0; j < ntowers; j++)
-    {
-      float energymult = towerenergies.at(j) * toweretas.at(j);
-      etamult += energymult;
-      etasum += towerenergies.at(j);
+    for (int j = 0; j < ntowers; j++) {
+        float energymult = towerenergies.at(j) * toweretas.at(j);
+        etamult += energymult;
+        etasum += towerenergies.at(j);
 
-      // convert [0,256] -> [0,2pi]
-      float alpha = towerphis.at(j)*2*M_PI/nTowersPhi;
-      x += cos(alpha)*towerenergies.at(j);
-      y += sin(alpha)*towerenergies.at(j);
+        int phibin = towerphis.at(j);
 
-      // int phibin = towerphis.at(j);
+        if (phibin - towerphis.at(0) < -nphibin / 2.0) {
+            phibin += nphibin;
+        }
+        else if (phibin - towerphis.at(0) > +nphibin / 2.0) {
+            phibin -= nphibin;
+        }
+        assert(std::abs(phibin - towerphis.at(0)) <= nphibin / 2.0);
 
-      // if (phibin - towerphis.at(0) < -nphibin / 2.0)
-      // {
-      //   phibin += nphibin;
-      // }
-      // else if (phibin - towerphis.at(0) > +nphibin / 2.0)
-      // {
-      //   phibin -= nphibin;
-      // }
-      // assert(std::abs(phibin - towerphis.at(0)) <= nphibin / 2.0);
-
-      // energymult = towerenergies.at(j) * phibin;
-      // phimult += energymult;
-      // phisum += towerenergies.at(j);
+        energymult = towerenergies.at(j) * phibin;
+        phimult += energymult;
+        phisum += towerenergies.at(j);
     }
 
-    // float avgphi = phimult / phisum;
+    float avgphi = phimult / phisum;
     float avgeta = etamult / etasum;
 
+    if (avgphi < 0) {
+        avgphi += nphibin;
+    }
+
+    avgphi = fmod(avgphi, nphibin);
+
+    if(avgphi >= 255.5) avgphi -= bins_phi;
+
     // returns angle in [-pi,pi]
-    float alpha = atan2(y,x);
+    // float alpha = atan2(y,x);
 
     // convert [-pi,pi] -> [0,2pi]
-    if(alpha < 0) alpha += 2*M_PI;
+    // if(alpha < 0) alpha += 2*M_PI;
 
     // convert [0,2pi] -> [0,256]
-    float avgphi = alpha*nTowersPhi/(2*M_PI);
+    // float avgphi = alpha*nTowersPhi/(2*M_PI);
 
     // if value is greater than 255.5 then wrap it back around
     // convert [255.5, 256] -> [-0.5, 0]
-    if(avgphi > nTowersPhi-0.5) avgphi -= nTowersPhi;
+    // if(avgphi > nTowersPhi-0.5) avgphi -= nTowersPhi;
 
     // if (avgphi < 0)
     // {
@@ -315,50 +335,59 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
     int etabin = -99;
     int phibin = -99;
 
+    // check if the cluster is in the north or south sector
+    if(avgeta < 47.5) {
+        etabin = h2SouthSector->GetXaxis()->FindBin(avgeta)-1;
+    }
+    else {
+        etabin = h2NorthSector->GetXaxis()->FindBin(avgeta)-1;
+    }
+    phibin = h2NorthSector->GetYaxis()->FindBin(avgphi)-1; // can use either h2NorthSector or h2SouthSector since both have the same phi binning
+
     // determine the bin number in eta
     // check if towerid is in the right half
     // towerid: 47.5 -> calib: 0 and towerid: 95.5 -> calib: 383
-    if(avgeta >= 47.5) {
-        for(int i = 0; i < bins_eta; ++i) {
-            if(avgeta >= 47.5 + i/8.0 && avgeta < 47.5 + (i+1)/8.0) {
-                etabin = i;
-                break;
-            }
-        }
-    }
-    // else towerid must be in the left half
-    // towerid: -0.5 -> calib: 383 and towerid: 47.5 -> calib: 0
-    else {
-        for(int i = 0; i < bins_eta; ++i) {
-            if(avgeta > 47.5 - (i+1)/8.0 && avgeta <= 47.5 - i/8.0 ) {
-                etabin = i;
-                break;
-            }
-        }
-    }
+//    if(avgeta >= 47.5) {
+//        for(int i = 0; i < bins_eta; ++i) {
+//            if(avgeta >= 47.5 + i/8.0 && avgeta < 47.5 + (i+1)/8.0) {
+//                etabin = i;
+//                break;
+//            }
+//        }
+//    }
+//    // else towerid must be in the left half
+//    // towerid: -0.5 -> calib: 383 and towerid: 47.5 -> calib: 0
+//    else {
+//        for(int i = 0; i < bins_eta; ++i) {
+//            if(avgeta > 47.5 - (i+1)/8.0 && avgeta <= 47.5 - i/8.0 ) {
+//                etabin = i;
+//                break;
+//            }
+//        }
+//    }
 
     // determine the bin number in phi
     // return the edge case which is not checked in the loop below
-    if(avgphi == 255.5) phibin = bins_phi-1;
-
-    else{
-      // search for towerid within each sector and obtain the correct phibin relative to the sector
-      for(int i = 0; i < 32; ++i) {
-        float tl = 8*i-0.5;
-        float th = 8*i+7.5;
-
-        if(avgphi >= tl && avgphi < th) {
-          // find the calibration constant location
-          for(int j = 0; j < bins_phi; ++j) {
-            if(avgphi >= tl + j/8.0 && avgphi < tl + (j+1)/8.0) {
-              phibin = j;
-              break;
-            }
-          }
-          break;
-        }
-      }
-    }
+//    if(avgphi == 255.5) phibin = bins_phi-1;
+//
+//    else{
+//        // search for towerid within each sector and obtain the correct phibin relative to the sector
+//        for(int i = 0; i < 32; ++i) {
+//            float tl = 8*i-0.5;
+//            float th = 8*i+7.5;
+//
+//            if(avgphi >= tl && avgphi < th) {
+//                // find the calibration constant location
+//                for(int j = 0; j < bins_phi; ++j) {
+//                    if(avgphi >= tl + j/8.0 && avgphi < tl + (j+1)/8.0) {
+//                        phibin = j;
+//                        break;
+//                    }
+//                }
+//                break;
+//            }
+//        }
+//    }
 
     // for (int j = 0; j < bins - 1; j++)
     // {
@@ -384,10 +413,16 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
     float ecore_recalib_val = 1;
     if (phibin > -1 && etabin > -1)
     {
-      // eclus_recalib_val = eclus_calib_constants.at(etabin).at(phibin);
-      // ecore_recalib_val = ecore_calib_constants.at(etabin).at(phibin);
-      eclus_recalib_val = calib_constants[phibin][etabin];
-      ecore_recalib_val = calib_constants[phibin][etabin];
+        // eclus_recalib_val = eclus_calib_constants.at(etabin).at(phibin);
+        // ecore_recalib_val = ecore_calib_constants.at(etabin).at(phibin);
+        if(avgeta < 47.5) {
+            eclus_recalib_val = calib_constants_south[phibin][etabin];
+            ecore_recalib_val = calib_constants_south[phibin][etabin];
+        }
+        else{
+            eclus_recalib_val = calib_constants_north[phibin][etabin];
+            ecore_recalib_val = calib_constants_north[phibin][etabin];
+        }
     }
     RawCluster *recalibcluster = dynamic_cast<RawCluster *>(cluster->CloneMe());
     assert(recalibcluster);

@@ -10,6 +10,7 @@
 
 #include <TNtuple.h>
 #include <TFile.h>
+#include <TH2F.h>
 
 class PHCompositeNode;
 class RawClusterContainer;
@@ -69,7 +70,8 @@ class RawClusterPositionCorrection : public SubsysReco
   // std::vector<std::vector<double> > ecore_calib_constants;
 
   // key: phibin, etabin
-  std::vector<std::vector<float>> calib_constants;
+  std::vector<std::vector<float>> calib_constants_north;
+  std::vector<std::vector<float>> calib_constants_south;
 
   int m_UseTowerInfo = 0;  // 0 only old tower, 1 only new (TowerInfo based),
 
@@ -77,8 +79,12 @@ class RawClusterPositionCorrection : public SubsysReco
   int nTowersEta;
   int bins_eta;
   int bins_phi;
-  std::string calib_file;
+  std::string calib_file_north;
+  std::string calib_file_south;
   int iEvent;
+
+  TH2F* h2NorthSector;
+  TH2F* h2SouthSector;
 };
 
 #endif
