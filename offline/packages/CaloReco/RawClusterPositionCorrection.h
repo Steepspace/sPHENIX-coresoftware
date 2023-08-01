@@ -26,48 +26,15 @@ class RawClusterPositionCorrection : public SubsysReco
 
   void CreateNodeTree(PHCompositeNode *topNode);
 
-  // const PHParameters &Get_eclus_CalibrationParameters() const
-  // {
-  //   return _eclus_calib_params;
-  // }
-  // PHParameters &Get_eclus_CalibrationParameters()
-  // {
-  //   return _eclus_calib_params;
-  // }
-  // const PHParameters &Get_eore_CalibrationParameters() const
-  // {
-  //   return _ecore_calib_params;
-  // }
-  // PHParameters &Get_ecore_CalibrationParameters()
-  // {
-  //   return _ecore_calib_params;
-  // }
-
-  // void Set_eclus_CalibrationParameters(const PHParameters &calib_params)
-  // {
-  //   _eclus_calib_params = calib_params;
-  // }
-  // void Set_ecore_CalibrationParameters(const PHParameters &calib_params)
-  // {
-  //   _ecore_calib_params = calib_params;
-  // }
-
   void set_UseTowerInfo(const int useMode)
   {  // 0 only old tower, 1 only new (TowerInfo based),
     m_UseTowerInfo = useMode;
   }
 
  private:
-  // PHParameters _eclus_calib_params;
-  // PHParameters _ecore_calib_params;
-  // void SetDefaultParameters(PHParameters &param);
   RawClusterContainer *_recalib_clusters{};
 
   std::string _det_name;
-
-  // std::vector<float> binvals;
-  // std::vector<std::vector<double> > eclus_calib_constants;
-  // std::vector<std::vector<double> > ecore_calib_constants;
 
   // key: phibin, etabin
   std::vector<std::vector<float>> calib_constants_north;
