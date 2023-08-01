@@ -244,9 +244,11 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
         avgphi += nphibin;
     }
 
-    avgphi = fmod(avgphi, nphibin);
+    avgphi = fmod(avgphi, nphibin); // ensures that avgphi is in [0, 256]
 
-    if(avgphi >= 255.5) avgphi -= bins_phi;
+    if(avgphi >= 255.5) avgphi -= bins_phi; // mapping [255.5, 256] to [-0.5, 0]
+
+    avgphi = fmod(avgphi+0.5,8)-0.5; // wrapping [-0.5, 255.5] to [-0.5, 7.5]
 
     int etabin = -99;
     int phibin = -99;
@@ -287,9 +289,11 @@ int RawClusterPositionCorrection::process_event(PHCompositeNode *topNode)
 
     if (Verbosity() >= Fun4AllBase::VERBOSITY_EVEN_MORE && clus_energy > 1)
     {
+      std::cout << "--------------------------------------------" << std::endl;
       std::cout << "Input eclus cluster energy: " << clus_energy << std::endl;
-      std::cout << "Recalib value: " << eclus_recalib_val << std::endl;
+      std::cout << "Key: " << phibin*bins_eta+etabin << ", Recalib value: " << eclus_recalib_val << std::endl;
       std::cout << "phibin: " << phibin << ", etabin: " << etabin << std::endl;
+      std::cout << "avgeta: " << avgeta << ", avgphi: " << avgphi << std::endl;
       std::cout << "Recalibrated eclus cluster energy: "
                 << clus_energy / eclus_recalib_val << std::endl;
       std::cout << "Input ecore cluster energy: "
