@@ -3,6 +3,7 @@
 #include "CentralityInfov2.h"
 
 #include <mbd/MbdOut.h>
+#include <mbd/MbdGeom.h>
 #include <mbd/MbdPmtContainer.h>
 #include <mbd/MbdPmtHit.h>
 
@@ -31,6 +32,7 @@
 
 CentralityReco::CentralityReco(const std::string &name)
   : SubsysReco(name)
+  , m_MBDParams(name)
 {
 
 }
@@ -194,6 +196,9 @@ int CentralityReco::FillVars()
       std::cout << scale_factor << "*" << m_centrality_scale << std::endl;
     }
 
+  double mbd_total_charge_south = 0;
+  double mbd_total_charge_north = 0;
+
   for (int i = 0; i < 128; i++)
     {
       
@@ -207,9 +212,29 @@ int CentralityReco::FillVars()
 	{
 	  continue;
 	}
+
+      double mbd_z = m_mbdgeom->get_z(i); //pmt z ~ eta
+
+      // South
+      if (mbd_z < 0)
+      {
+        mbd_total_charge_south += m_mbd_hit->get_q()*scale_factor*m_centrality_scale;
+      }
+      // North
+      if (mbd_z > 0)
+      {
+        mbd_total_charge_north += m_mbd_hit->get_q()*scale_factor*m_centrality_scale;
+      }
+
       m_mbd_total_charge += m_mbd_hit->get_q()*scale_factor*m_centrality_scale;
     }
 
+  m_MBDParams.set_double_param("mbd_total_charge", m_mbd_total_charge);
+  m_MBDParams.set_double_param("mbd_total_charge_south", mbd_total_charge_south);
+  m_MBDParams.set_double_param("mbd_total_charge_north", mbd_total_charge_north);
+  m_MBDParams.set_double_param("mbd_scale_factor", scale_factor);
+  m_MBDParams.set_double_param("mbd_centrality_scale", m_centrality_scale);
+  m_MBDParams.UpdateNodeTree(m_parNode, "MbdParams");
 
   return Fun4AllReturnCodes::EVENT_OK;
 }
@@ -335,6 +360,23 @@ int CentralityReco::GetNodes(PHCompositeNode *topNode)
       std::cout << "no MBD out node " << std::endl;
       return Fun4AllReturnCodes::ABORTRUN;
     }
+
+  m_mbdgeom = findNode::getClass<MbdGeom>(topNode, "MbdGeom"); // mbd geometry
+  if(!m_mbdgeom)
+  {
+      std::cout << "no MbdGeom node " << std::endl;
+    return Fun4AllReturnCodes::ABORTRUN;
+  }
+
+  PHNodeIterator parIter(topNode);
+  m_parNode = dynamic_cast<PHCompositeNode *>(parIter.findFirst("PHCompositeNode", "PAR"));
+  if (!m_parNode)
+  {
+    std::cout << "No RUN node found; cannot create PHParameters for storing cut results. Aborting run!";
+    return Fun4AllReturnCodes::ABORTRUN;
+  }
+
+  m_MBDParams.SaveToNodeTree(m_parNode, "MbdParams");
 
   return Fun4AllReturnCodes::EVENT_OK;
 }

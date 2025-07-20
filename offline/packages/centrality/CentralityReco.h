@@ -1,6 +1,7 @@
 #ifndef CENTRALITY_CENTRALITYRECO_H
 #define CENTRALITY_CENTRALITYRECO_H
 
+#include <phparameter/PHParameters.h>
 #include <fun4all/SubsysReco.h>
 #include <array>
 #include <vector>
@@ -13,6 +14,7 @@ class MinimumBiasInfo;
 class PHCompositeNode;
 class GlobalVertexMap;
 class MbdOut;
+class MbdGeom;
 class MbdPmtContainer;
 class MbdPmtHit;
 
@@ -78,6 +80,7 @@ class CentralityReco : public SubsysReco
   MbdOut *m_mbd_out{nullptr};
   MbdPmtContainer *m_mbd_container{nullptr};
   MbdPmtHit *m_mbd_hit{nullptr};
+  MbdGeom *m_mbdgeom{nullptr};
   MinimumBiasInfo *m_mb_info{nullptr};
   CentralityInfo *m_central{nullptr};
 
@@ -89,7 +92,8 @@ class CentralityReco : public SubsysReco
   std::vector<std::pair<std::pair<float, float>, float>>  m_vertex_scales{};
   std::array<float, 100> m_centrality_map{};
 
-
+  PHParameters m_MBDParams;
+  PHCompositeNode* m_parNode{nullptr};
 };
 
 #endif
