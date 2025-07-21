@@ -3,6 +3,7 @@
 
 #include "MinimumBiasInfo.h"
 
+#include <phparameter/PHParameters.h>
 #include <fun4all/SubsysReco.h>
 
 #include <array>
@@ -149,6 +150,9 @@ class MinimumBiasClassifier : public SubsysReco
   std::array<int, 2> m_mbd_hit{};
 
   std::array<std::vector<std::pair<std::pair<float, float>, float>>, 3> m_vertex_scales{};
+
+  PHParameters m_MinBiasParams;
+  PHCompositeNode* m_parNode{nullptr};
 };
 
 #endif
