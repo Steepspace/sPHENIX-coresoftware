@@ -134,6 +134,14 @@ int MinimumBiasClassifier::FillMinimumBiasInfo()
     m_mb_info->setBunchClass(MinimumBiasInfo::BUNCH::NONE);
   }
 
+  // set defaults
+  m_MinBiasParams.set_int_param("minbias_bunch_class_fail", false);
+  m_MinBiasParams.set_int_param("minbias_background_cut_fail", false);
+  m_MinBiasParams.set_int_param("minbias_two_hit_min_fail", false);
+  m_MinBiasParams.set_int_param("minbias_zdc_energy_min_fail", false);
+  m_MinBiasParams.set_int_param("minbias_mbd_total_energy_max_fail", false);
+  m_MinBiasParams.UpdateNodeTree(m_parNode, "MinBiasParams");
+
   // if (!m_global_vertex_map)
   // {
   //   m_mb_info->setIsAuAuMinimumBias(false);
@@ -200,6 +208,7 @@ int MinimumBiasClassifier::FillMinimumBiasInfo()
   if (bunch == MinimumBiasInfo::BUNCH::NONE)
   {
     minbiascheck = false;
+    m_MinBiasParams.set_int_param("minbias_bunch_class_fail", true);
   }
   const int scale_class = (bunch == MinimumBiasInfo::BUNCH::NONE ? MinimumBiasInfo::BUNCH::MAIN : bunch);
 
@@ -221,12 +230,6 @@ int MinimumBiasClassifier::FillMinimumBiasInfo()
       return 0;
     }
   }
-
-  // set defaults
-  m_MinBiasParams.set_int_param("minbias_background_cut_fail", false);
-  m_MinBiasParams.set_int_param("minbias_two_hit_min_fail", false);
-  m_MinBiasParams.set_int_param("minbias_zdc_energy_min_fail", false);
-  m_MinBiasParams.set_int_param("minbias_mbd_total_energy_max_fail", false);
 
   //  Z vertex is within range
   if (std::fabs(m_vertex) > m_z_vtx_cut && minbiascheck)
