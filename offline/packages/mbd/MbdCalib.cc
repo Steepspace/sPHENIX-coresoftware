@@ -16,6 +16,7 @@
 #include <iostream>
 #include <regex>
 #include <string>
+#include <format>
 
 #include <TString.h>
 
@@ -85,6 +86,13 @@ int MbdCalib::Download_All()
     Download_SampMax(sampmax_url);
 
     std::string qfit_url = _cdb->getUrl("MBD_QFIT");
+    // temporary default
+    bool has_latest_qfit = qfit_url.ends_with(std::format("{}.root", _rc->get_uint64Flag("TIMESTAMP")));
+    if (!has_latest_qfit)
+    {
+      qfit_url = "/cvmfs/sphenix.sdcc.bnl.gov/calibrations/sphnxpro/cdb/MBD_QFIT/96/6e/966e7c425212ccf9086349fc2b6c0d07_mbd_qfit-66747.root";
+      std::cout << "Overwriting MBD_QFIT to " << qfit_url << std::endl;
+    }
     if (Verbosity() > 0)
     {
       std::cout << "qfit_url " << qfit_url << std::endl;
