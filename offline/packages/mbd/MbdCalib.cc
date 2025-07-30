@@ -87,10 +87,11 @@ int MbdCalib::Download_All()
 
     std::string qfit_url = _cdb->getUrl("MBD_QFIT");
     // temporary default
-    bool has_latest_qfit = qfit_url.ends_with(std::format("{}.root", _rc->get_uint64Flag("TIMESTAMP")));
+    unsigned int runnumber = _rc->get_uint64Flag("TIMESTAMP");
+    bool has_latest_qfit = qfit_url.ends_with(std::format("{}.root", runnumber));
     if (!has_latest_qfit)
     {
-      qfit_url = "/cvmfs/sphenix.sdcc.bnl.gov/calibrations/sphnxpro/cdb/MBD_QFIT/96/6e/966e7c425212ccf9086349fc2b6c0d07_mbd_qfit-66747.root";
+      qfit_url = "/cvmfs/sphenix.sdcc.bnl.gov/calibrations/sphnxpro/cdb/MBD_QFIT_default/7b/f4/7bf4b8b35d21cd24e73e2fe5ca893775_mbd_qfit_66400_99999.root";
       std::cout << "Overwriting MBD_QFIT to " << qfit_url << std::endl;
     }
     if (Verbosity() > 0)
