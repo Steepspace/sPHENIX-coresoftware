@@ -31,6 +31,9 @@
 #include <phool/getClass.h>
 #include <phool/phool.h>
 
+#include <pdbcalbase/PdbParameterMap.h>
+#include <phparameter/PHParameters.h>
+
 #include <TLorentzVector.h>
 
 // standard includes
@@ -835,6 +838,32 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
           std::cout << "DetermineTowerBackground::process_event: flow extracted from sEPD, setting Psi2 = " << _Psi2 << " ( " << _Psi2 / M_PI << " * pi ) " << std::endl;
         }
 
+      }
+      else if(_do_flow == 4)
+      { // sEPD LOCAL event plane extraction
+
+        PdbParameterMap *pdb = findNode::getClass<PdbParameterMap>(topNode, "CalibQVec");
+        if (pdb != nullptr)
+        {
+          PHParameters pdb_params("CalibQVec");
+          pdb_params.FillFrom(pdb);
+
+          // double Psi2_S = pdb_params.get_double_param("Psi2_S");
+          double Psi2_N = pdb_params.get_double_param("Psi2_N");
+
+          // Use North Psi2
+          _Psi2 = Psi2_N;
+
+          if (Verbosity() > 0)
+          {
+            std::cout << "DetermineTowerBackground::process_event: flow extracted from sEPD, setting Psi2 = " << _Psi2 << " ( " << _Psi2 / M_PI << " * pi ) " << std::endl;
+          }
+        }
+        else
+        {
+          _is_flow_failure = true;
+          _Psi2 = 0;
+        }
       }
 
       if (std::isnan(_Psi2) || std::isinf(_Psi2))
