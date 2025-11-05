@@ -848,11 +848,14 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
           PHParameters pdb_params("CalibQVec");
           pdb_params.FillFrom(pdb);
 
-          // double Psi2_S = pdb_params.get_double_param("Psi2_S");
-          double Psi2_N = pdb_params.get_double_param("Psi2_N");
+          double Psi2_S = pdb_params.get_double_param("Psi2_S");
+          // double Psi2_N = pdb_params.get_double_param("Psi2_N");
 
           // Use North Psi2
-          _Psi2 = Psi2_N;
+          // _Psi2 = Psi2_N;
+
+          // Use South Psi2
+          _Psi2 = Psi2_S;
 
           if (Verbosity() > 0)
           {
