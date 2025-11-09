@@ -1137,19 +1137,20 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
           }
         }
 
-        if (!isExcluded)
+        float denom =  1 + 2 * _v2 * std::cos(2 * (this_phi - _Psi2));
+        if (!isExcluded && denom != 0)
         {
           if (layer == 0)
           {
-            total_E += _EMCAL_E[eta][phi] / (1 + 2 * _v2 * std::cos(2 * (this_phi - _Psi2)));
+            total_E += _EMCAL_E[eta][phi] / denom;
           }
           if (layer == 1)
           {
-            total_E += _IHCAL_E[eta][phi] / (1 + 2 * _v2 * std::cos(2 * (this_phi - _Psi2)));
+            total_E += _IHCAL_E[eta][phi] / denom;
           }
           if (layer == 2)
           {
-            total_E += _OHCAL_E[eta][phi] / (1 + 2 * _v2 * std::cos(2 * (this_phi - _Psi2)));
+            total_E += _OHCAL_E[eta][phi] / denom;
           }
           total_tower++;  // towers in this eta range & layer
           _nTowers++;     // towers in entire calorimeter
