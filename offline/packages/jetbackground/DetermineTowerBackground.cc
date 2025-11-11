@@ -1138,7 +1138,7 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
         }
 
         float denom =  1 + 2 * _v2 * std::cos(2 * (this_phi - _Psi2));
-        if (!isExcluded && denom != 0)
+        if (!isExcluded && denom > 0)
         {
           if (layer == 0)
           {
