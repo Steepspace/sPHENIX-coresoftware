@@ -14,6 +14,7 @@ class TowerBackground : public PHObject
   int isValid() const override { return 0; }
 
   virtual void set_UE(int /*layer*/, const std::vector<float> & /*UE*/) {}
+  virtual void set_sum_E(float) {}
   virtual void set_v2(float) {}
   virtual void set_Psi2(float) {}
   virtual void set_nStripsUsedForFlow(int) {}
@@ -26,6 +27,7 @@ class TowerBackground : public PHObject
   virtual int get_nStripsUsedForFlow() const { return 0; }
   virtual int get_nTowersUsedForBkg() const { return 0; }
   virtual bool get_flow_failure_flag() const { return false; }
+  virtual float get_sum_E() const { return 0; }
 
  protected:
   TowerBackground() {}
