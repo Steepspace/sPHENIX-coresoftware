@@ -61,6 +61,7 @@ class DetermineTowerBackground : public SubsysReco
   std::vector<std::vector<float> > _UE;
   int _nStrips{0};
   int _nTowers{0};
+  float _sum_E{0.F};
 
   int _HCAL_NETA{-1};
   int _HCAL_NPHI{-1};

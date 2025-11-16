@@ -1,7 +1,7 @@
 #include "DetermineTowerBackground.h"
 
 #include "TowerBackground.h"
-#include "TowerBackgroundv1.h"
+#include "TowerBackgroundv2.h"
 
 #include <calobase/RawTower.h>
 #include <calobase/RawTowerContainer.h>
@@ -727,7 +727,7 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
       // flow determination
       float Q_x = 0;
       float Q_y = 0;
-      float sum_E = 0;
+      _sum_E = 0;
       for (int phi = 0; phi < _HCAL_NPHI; phi++)
       {
         _FULLCALOFLOW_PHI_VAL[phi] = geomIH->get_phicenter(phi);
@@ -749,7 +749,7 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
         // sum up the energy in this phi bin
         Q_x += _FULLCALOFLOW_PHI_E[phi] * cos(2 * _FULLCALOFLOW_PHI_VAL[phi]);
         Q_y += _FULLCALOFLOW_PHI_E[phi] * sin(2 * _FULLCALOFLOW_PHI_VAL[phi]);
-        sum_E += _FULLCALOFLOW_PHI_E[phi];
+        _sum_E += _FULLCALOFLOW_PHI_E[phi];
 
       } 
 
@@ -848,6 +848,7 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
           PHParameters pdb_params("CalibQVec");
           pdb_params.FillFrom(pdb);
 
+          // double Psi2_NS = pdb_params.get_double_param("Psi2_NS");
           double Psi2_S = pdb_params.get_double_param("Psi2_S");
           // double Psi2_N = pdb_params.get_double_param("Psi2_N");
 
@@ -856,6 +857,9 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
 
           // Use South Psi2
           _Psi2 = Psi2_S;
+
+          // Use North South Psi2
+          // _Psi2 = Psi2_NS;
 
           if (Verbosity() > 0)
           {
@@ -888,9 +892,9 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
       
 
       // avoid nans in v2
-      if (sum_E > 0)
+      if (_sum_E > 0)
       {
-        _v2 /= sum_E;
+        _v2 /= _sum_E;
       }
       else
       {
@@ -899,7 +903,7 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
       
       if (Verbosity() > 0)
       {
-        std::cout << "DetermineTowerBackground::process_event: unnormalized Q vector (Qx, Qy) = ( " << Q_x << ", " << Q_y << " ) with Sum E_i = " << sum_E << std::endl;
+        std::cout << "DetermineTowerBackground::process_event: unnormalized Q vector (Qx, Qy) = ( " << Q_x << ", " << Q_y << " ) with Sum E_i = " << _sum_E << std::endl;
         std::cout << "DetermineTowerBackground::process_event: Psi2 = " << _Psi2 << " ( " << _Psi2 / M_PI << " * pi " << (_do_flow == 2 ? "from Hijing " : "") << ") , v2 = " << _v2 << " ( using " << _nStrips << " ) " << std::endl;
       }
     } 
@@ -1100,7 +1104,7 @@ int DetermineTowerBackground::CreateNode(PHCompositeNode *topNode)
   TowerBackground *towerbackground = findNode::getClass<TowerBackground>(topNode, _backgroundName);
   if (!towerbackground)
   {
-    towerbackground = new TowerBackgroundv1();
+    towerbackground = new TowerBackgroundv2();
     PHIODataNode<PHObject> *bkgDataNode = new PHIODataNode<PHObject>(towerbackground, _backgroundName, "PHObject");
     bkgNode->addNode(bkgDataNode);
   }
@@ -1127,6 +1131,8 @@ void DetermineTowerBackground::FillNode(PHCompositeNode *topNode)
   towerbackground->set_UE(2, _UE[2]);
 
   towerbackground->set_v2(_v2);
+
+  towerbackground->set_sum_E(_sum_E);
 
   towerbackground->set_Psi2(_Psi2);
 
