@@ -62,6 +62,7 @@ pkginclude_HEADERS = \
   TimingCut.h \
   TowerBackground.h \
   TowerBackgroundv1.h \
+  TowerBackgroundv2.h \
   TowerRho.h \
   TowerRhov1.h
 
@@ -70,6 +71,7 @@ ROOTDICTS = \
   EventRhov1_Dict.cc \
   TowerBackground_Dict.cc \
   TowerBackgroundv1_Dict.cc \
+  TowerBackgroundv2_Dict.cc \
   TowerRho_Dict.cc \
   TowerRhov1_Dict.cc
 
@@ -81,6 +83,7 @@ libjetbackground_io_la_SOURCES = \
   $(ROOTDICTS) \
   EventRhov1.cc \
   TowerBackgroundv1.cc \
+  TowerBackgroundv2.cc \
   TowerRhov1.cc
 
 libjetbackground_la_SOURCES = \
