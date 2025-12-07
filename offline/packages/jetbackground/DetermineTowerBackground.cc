@@ -340,6 +340,8 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
     }
   }
 
+  _nHIRecoSeedsSub = 0;
+
   // seed type 1 is the set of those jets above which, when their
   // kinematics are updated for the first background subtraction, have
   // pT > 20 GeV
@@ -374,6 +376,8 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
 
       _seed_eta.push_back(this_eta);
       _seed_phi.push_back(this_phi);
+
+      ++_nHIRecoSeedsSub;
 
       int seed_ieta = geomIH->get_etabin(this_eta);
         
@@ -473,6 +477,7 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
   _Psi2 = 0;
   _v2 = 0;
   _nStrips = 0;
+  _nStripsCEMC = 0;
   _is_flow_failure = false;
 
 
@@ -719,6 +724,7 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
       
 
       _nStrips = nStripsAvailableForFlow;
+      _nStripsCEMC = AVAILIBLE_ETA_STRIPS_CEMC.size();
       
       // update the full calorimeter flow vectors
       _FULLCALOFLOW_PHI_E.assign(_HCAL_NPHI, 0.0);
@@ -912,6 +918,7 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
       _Psi2 = 0;
       _v2 = 0;
       _nStrips = 0;
+      _nStripsCEMC = 0;
       _is_flow_failure = true;
       if (Verbosity() > 0)
       {
@@ -1137,6 +1144,10 @@ void DetermineTowerBackground::FillNode(PHCompositeNode *topNode)
   towerbackground->set_Psi2(_Psi2);
 
   towerbackground->set_nStripsUsedForFlow(_nStrips);
+
+  towerbackground->set_nStripsCEMCUsedForFlow(_nStripsCEMC);
+
+  towerbackground->set_nHIRecoSeedsSub(_nHIRecoSeedsSub);
 
   towerbackground->set_nTowersUsedForBkg(_nTowers);
 

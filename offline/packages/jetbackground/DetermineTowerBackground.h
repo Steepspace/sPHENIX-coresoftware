@@ -60,6 +60,8 @@ class DetermineTowerBackground : public SubsysReco
   float _Psi2{0};
   std::vector<std::vector<float> > _UE;
   int _nStrips{0};
+  int _nStripsCEMC{0};
+  int _nHIRecoSeedsSub{0};
   int _nTowers{0};
   float _sum_E{0.F};
 
