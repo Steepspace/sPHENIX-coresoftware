@@ -12,6 +12,15 @@ class TowerBackgroundv2 : public TowerBackground
   TowerBackgroundv2();
   ~TowerBackgroundv2() override = default;
 
+  // Copy Constructor
+  TowerBackgroundv2(const TowerBackgroundv2& other) = default;
+  // Copy Assignment Operator
+  TowerBackgroundv2& operator=(const TowerBackgroundv2& other) = default;
+  // Move Constructor
+  TowerBackgroundv2(TowerBackgroundv2&& other) noexcept = default;
+  // Move Assignment Operator
+  TowerBackgroundv2& operator=(TowerBackgroundv2&& other) noexcept = default;
+
   void identify(std::ostream &os = std::cout) const override;
   void Reset() override {}
   int isValid() const override { return 1; }
