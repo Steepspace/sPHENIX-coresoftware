@@ -171,6 +171,9 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
   std::set<int> EtaStripsAvailbleForFlow = {};
   for ( int eta = 0; eta < _HCAL_NETA; eta++) { EtaStripsAvailbleForFlow.insert(eta); }
 
+  _nHIRecoSeedsSubIt1 = 0;
+  _nHIRecoSeedsSubIt1_positiveE = 0;
+
   // seed type 0 is D > 3 R=0.2 jets run on retowerized CEMC
   if (_seed_type == 0)
   {
@@ -321,6 +324,13 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
 
         // set first iteration seed property
         this_jet->set_property(_index_SeedItr, 1.0);
+
+        ++_nHIRecoSeedsSubIt1;
+
+        if (this_jet->get_e() > 0)
+        {
+          ++_nHIRecoSeedsSubIt1_positiveE;
+        }
 
         if (Verbosity() > 1)
         {
@@ -1148,6 +1158,8 @@ void DetermineTowerBackground::FillNode(PHCompositeNode *topNode)
   towerbackground->set_nStripsCEMCUsedForFlow(_nStripsCEMC);
 
   towerbackground->set_nHIRecoSeedsSub(_nHIRecoSeedsSub);
+  towerbackground->set_nHIRecoSeedsSubIt1(_nHIRecoSeedsSubIt1);
+  towerbackground->set_nHIRecoSeedsSubIt1_positiveE(_nHIRecoSeedsSubIt1_positiveE);
 
   towerbackground->set_nTowersUsedForBkg(_nTowers);
 

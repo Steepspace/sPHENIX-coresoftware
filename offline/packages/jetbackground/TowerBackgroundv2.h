@@ -31,6 +31,8 @@ class TowerBackgroundv2 : public TowerBackground
   void set_nStripsUsedForFlow(int nStrips) override { _nStrips = nStrips; }
   void set_nStripsCEMCUsedForFlow(int nStrips) override { _nStripsCEMC = nStrips; }
   void set_nHIRecoSeedsSub(int seeds) override { _nHIRecoSeedsSub = seeds; }
+  void set_nHIRecoSeedsSubIt1(int seeds) override { _nHIRecoSeedsSubIt1 = seeds; }
+  void set_nHIRecoSeedsSubIt1_positiveE(int seeds) override { _nHIRecoSeedsSubIt1_positiveE = seeds; }
   void set_nTowersUsedForBkg(int nTowers) override { _nTowers = nTowers; }
   void set_flow_failure_flag(bool b) override {_flow_failure_flag = b;}
 
@@ -40,6 +42,8 @@ class TowerBackgroundv2 : public TowerBackground
   int get_nStripsUsedForFlow() const override { return _nStrips; }
   int get_nStripsCEMCUsedForFlow() const override { return _nStripsCEMC; }
   int get_nHIRecoSeedsSub() const override { return _nHIRecoSeedsSub; }
+  int get_nHIRecoSeedsSubIt1() const override { return _nHIRecoSeedsSubIt1; }
+  int get_nHIRecoSeedsSubIt1_positiveE() const override { return _nHIRecoSeedsSubIt1_positiveE; }
   int get_nTowersUsedForBkg() const override { return _nTowers; }
   bool get_flow_failure_flag() const override { return _flow_failure_flag; }
 
@@ -54,6 +58,8 @@ class TowerBackgroundv2 : public TowerBackground
   int _nStrips{0};
   int _nStripsCEMC{0};
   int _nHIRecoSeedsSub{0};
+  int _nHIRecoSeedsSubIt1{0};
+  int _nHIRecoSeedsSubIt1_positiveE{0};
   int _nTowers{0};
   bool _flow_failure_flag{false};
   float _sum_E{0.F};
