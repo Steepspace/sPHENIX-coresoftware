@@ -20,8 +20,6 @@ class TowerBackground : public PHObject
   virtual void set_nStripsUsedForFlow(int) {}
   virtual void set_nStripsCEMCUsedForFlow(int) {}
   virtual void set_nHIRecoSeedsSub(int) {}
-  virtual void set_nHIRecoSeedsSubIt1(int) {}
-  virtual void set_nHIRecoSeedsSubIt1_positiveE(int) {}
   virtual void set_nTowersUsedForBkg(int) {}
   virtual void set_flow_failure_flag(bool) {}
 
@@ -31,8 +29,6 @@ class TowerBackground : public PHObject
   virtual int get_nStripsUsedForFlow() const { return 0; }
   virtual int get_nStripsCEMCUsedForFlow() const { return 0; }
   virtual int get_nHIRecoSeedsSub() const { return 0; }
-  virtual int get_nHIRecoSeedsSubIt1() const { return 0; }
-  virtual int get_nHIRecoSeedsSubIt1_positiveE() const { return 0; }
   virtual int get_nTowersUsedForBkg() const { return 0; }
   virtual bool get_flow_failure_flag() const { return false; }
   virtual float get_sum_E() const { return 0; }
