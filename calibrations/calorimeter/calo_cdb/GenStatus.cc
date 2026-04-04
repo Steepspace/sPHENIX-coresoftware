@@ -315,7 +315,12 @@ void GenStatus::process(const std::string &input, const std::string &output)
   std::string outputDir = datasetDir.str();
 
   std::string hotMapFile = "EMCalHotMap_" + m_dataset + "_" + m_run + ".root";
+  std::string hotMapFile_IHCAL = "HCALIN_BadTowerMap_" + m_dataset + "_" + m_run + ".root";
+  std::string hotMapFile_OHCAL = "HCALOUT_BadTowerMap_" + m_dataset + "_" + m_run + ".root";
+
   std::string hotMapOutput = datasetDir.str() + "/" + hotMapFile;
+  std::string hotMapOutput_IHCAL = datasetDir.str() + "/" + hotMapFile_IHCAL;
+  std::string hotMapOutput_OHCAL = datasetDir.str() + "/" + hotMapFile_OHCAL;
 
   datasetDir << "/QA";
 
@@ -323,6 +328,8 @@ void GenStatus::process(const std::string &input, const std::string &output)
   std::filesystem::create_directories(datasetDir.str());
 
   std::string hotMapOutputQA = datasetDir.str() + "/" + hotMapFile;
+  std::string hotMapOutputQA_IHCAL = datasetDir.str() + "/" + hotMapFile_IHCAL;
+  std::string hotMapOutputQA_OHCAL = datasetDir.str() + "/" + hotMapFile_OHCAL;
 
   // merges individal qa into one per run
   int ret = readHists(input);
@@ -336,9 +343,21 @@ void GenStatus::process(const std::string &input, const std::string &output)
   std::unique_ptr<emcNoisyTowerFinder> calo = std::make_unique<emcNoisyTowerFinder>();
   calo->FindHot(m_CaloValid_list, hotMapOutput, "h_CaloValid_cemc_etaphi");
 
+  std::unique_ptr<emcNoisyTowerFinder> calo_ihcal = std::make_unique<emcNoisyTowerFinder>();
+  calo_ihcal->set_ihcal();
+  calo_ihcal->Verbosity(1);
+  calo_ihcal->FindHot(m_CaloValid_list, hotMapOutput_IHCAL, "h_CaloValid_ihcal_etaphi");
+
+  std::unique_ptr<emcNoisyTowerFinder> calo_ohcal = std::make_unique<emcNoisyTowerFinder>();
+  calo_ohcal->set_ohcal();
+  calo_ohcal->Verbosity(1);
+  calo_ohcal->FindHot(m_CaloValid_list, hotMapOutput_OHCAL, "h_CaloValid_ohcal_etaphi");
+
   if (std::filesystem::exists(hotMapOutput))
   {
     std::filesystem::rename(hotMapOutput, hotMapOutputQA);
+    std::filesystem::rename(hotMapOutput_IHCAL, hotMapOutputQA_IHCAL);
+    std::filesystem::rename(hotMapOutput_OHCAL, hotMapOutputQA_OHCAL);
   }
   else
   {
