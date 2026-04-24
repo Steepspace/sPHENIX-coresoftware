@@ -60,6 +60,11 @@ class DetermineTowerBackground : public SubsysReco
     return;
   }
 
+  void set_EventPlaneInfoNodeName(const std::string &name)
+  {
+    m_EventPlaneInfoNodeName = name;
+  }
+
  private:
 
   int CreateNode(PHCompositeNode *topNode);
@@ -123,6 +128,7 @@ class DetermineTowerBackground : public SubsysReco
 
   std::string m_towerNodePrefix{"TOWERINFO_CALIB"};
   std::string m_jetnode{"AntiKt_TowerInfo_HIRecoSeedsRaw_r02"};
+  std::string m_EventPlaneInfoNodeName{"EventplaneinfoMap"};
 
   std::string EMTowerName;
   std::string IHTowerName;

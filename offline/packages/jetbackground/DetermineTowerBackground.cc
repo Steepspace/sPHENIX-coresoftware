@@ -602,7 +602,7 @@ int DetermineTowerBackground::process_event(PHCompositeNode *topNode)
   else if (_do_flow == 3 || _do_flow == 4)
     { // sEPD event plane extraction
       // get event plane map
-      EventplaneinfoMap *epmap = findNode::getClass<EventplaneinfoMap>(topNode, "EventplaneinfoMap");
+      EventplaneinfoMap *epmap = findNode::getClass<EventplaneinfoMap>(topNode, m_EventPlaneInfoNodeName);
       if (!epmap)
         {
           std::cout << "DetermineTowerBackground::process_event: FATAL, EventplaneinfoMap does not exist, cannot extract sEPD flow with do_flow = " << _do_flow << std::endl;
