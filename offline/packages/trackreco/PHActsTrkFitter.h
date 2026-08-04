@@ -41,6 +41,7 @@ class TrackSeedContainer;
 class TrkrClusterContainer;
 class SvtxAlignmentStateMap;
 class PHG4TpcGeomContainer;
+class PHCompositeNode;
 
 using SourceLink = ActsSourceLink;
 using FitResult = ActsTrackFittingAlgorithm::TrackFitterResult;
@@ -275,7 +276,7 @@ class PHActsTrkFitter : public SubsysReco
   int m_cluster_edge_rejection = 0;
 
   /// extrapolation mode
-  ExtrapolationMode m_extrapolation_mode = ExtrapolationMode::Default;
+  ExtrapolationMode m_extrapolation_mode = ExtrapolationMode::Bidirectional;
 
   //!@name evaluator
   //@{
@@ -326,6 +327,7 @@ class PHActsTrkFitter : public SubsysReco
 
   std::vector<const Acts::Surface*> m_materialSurfaces = {};
 
+  PHCompositeNode *_topNode = nullptr;
 };
 
 #endif
