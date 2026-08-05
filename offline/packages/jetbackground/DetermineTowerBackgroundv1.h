@@ -126,6 +126,7 @@ class DetermineTowerBackgroundv1 : public SubsysReco
   float m_psi2  = 0;
   int m_nstrips = 0;
   int m_ntowers = 0;
+  int m_n_accepted_seeds = 0;
 
   float m_ihcal_r = 0.0;
   float m_ohcal_r = 0.0;

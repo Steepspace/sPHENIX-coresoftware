@@ -1,7 +1,7 @@
 #include "DetermineTowerBackgroundv1.h"
 
 #include "TowerBackground.h"
-#include "TowerBackgroundv1.h"
+#include "TowerBackgroundv2.h"
 
 #include <calobase/RawTower.h>
 #include <calobase/RawTowerContainer.h>
@@ -1127,6 +1127,7 @@ int DetermineTowerBackgroundv1::process_event(PHCompositeNode *topNode)
 
 
   } // now seeds are excluded
+  m_n_accepted_seeds = n_accepted_seeds;
 
   // if we have exclude eta full strip then we do that here
   // these are only eta strips that have a seed in them - not bad towers
@@ -1634,7 +1635,7 @@ int DetermineTowerBackgroundv1::CreateNode(PHCompositeNode *topNode)
   TowerBackground *towerbackground = findNode::getClass<TowerBackground>(topNode, m_background_node);
   if (!towerbackground)
   {
-    towerbackground = new TowerBackgroundv1();
+    towerbackground = new TowerBackgroundv2();
     PHIODataNode<PHObject> *bkgDataNode = new PHIODataNode<PHObject>(towerbackground, m_background_node, "PHObject");
     bkgNode->addNode(bkgDataNode);
   }
@@ -1669,6 +1670,8 @@ void DetermineTowerBackgroundv1::FillNode(PHCompositeNode *topNode , const std::
   towerbackground->set_nTowersUsedForBkg(m_ntowers);
 
   towerbackground->set_flow_failure_flag(m_is_flow_failure);
+
+  towerbackground->set_nHIRecoSeedsSub(m_n_accepted_seeds);
 
   return;
 }
