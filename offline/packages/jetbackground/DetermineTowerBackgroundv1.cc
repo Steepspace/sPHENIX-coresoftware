@@ -51,6 +51,7 @@
 #include <map>
 #include <utility>
 #include <vector>
+#include <format>
 #include <set>
 #include <string>
 #include <cassert>
@@ -151,12 +152,12 @@ int DetermineTowerBackgroundv1::LoadEtaCalib()
   m_calib_zvtx_edges.resize( n_z + 1 );
   for ( int i = 0; i <= n_z; ++i )
   {
-    m_calib_zvtx_edges[i] = m_calib_tree->GetSingleFloatValue( Form( "zvtx_edge_%d", i ) );
+    m_calib_zvtx_edges[i] = m_calib_tree->GetSingleFloatValue(std::format("zvtx_edge_{}", i));
   }
   m_calib_mbdQ_edges.resize( n_mbd + 1 );
   for ( int i = 0; i <= n_mbd; ++i )
   {
-    m_calib_mbdQ_edges[i] = m_calib_tree->GetSingleFloatValue( Form( "mbdQ_edge_%d", i ) );
+    m_calib_mbdQ_edges[i] = m_calib_tree->GetSingleFloatValue(std::format("mbdQ_edge_{}", i));
   }
 
   m_etaCalib_loaded = true;
@@ -172,19 +173,19 @@ float DetermineTowerBackgroundv1::get_etaWeight( const int layer_index, const in
 {
   if ( !m_use_etaCalib || !m_etaCalib_loaded || !m_calib_tree )
   {
-    return 1.0f;
+    return 1.0F;
   }
   if ( layer_index < 0 || layer_index >= static_cast<int>(m_calib_layer_names.size()) )
   {
-    return 1.0f;
+    return 1.0F;
   }
   if ( m_calib_izbin < 0 || m_calib_imbd < 0 )
   {
-    return 1.0f;  // event's (zvertex,mbdQ) falls outside the calibrated range
+    return 1.0F;  // event's (zvertex,mbdQ) falls outside the calibrated range
   }
   if ( ieta < 0 || ieta >= m_calib_n_eta_expected )
   {
-    return 1.0f;
+    return 1.0F;
   }
 
   const int n_mbd_bins = static_cast<int>(m_calib_mbdQ_edges.size()) - 1;
@@ -192,7 +193,7 @@ float DetermineTowerBackgroundv1::get_etaWeight( const int layer_index, const in
   const float w = m_calib_tree->GetFloatValue( channel, m_calib_layer_names.at( layer_index ) );
   if ( !(w > 0) || std::isnan(w) )
   {
-    return 1.0f;
+    return 1.0F;
   }
   return w;
 }
@@ -316,7 +317,7 @@ int DetermineTowerBackgroundv1::get_zvrtx(PHCompositeNode *topNode)
 
 TowerInfoContainer * DetermineTowerBackgroundv1::LoadTowerInfoContainer(PHCompositeNode *topNode, const std::string &tower_node_name)
 {
-  auto * tic = findNode::getClass<TowerInfoContainer>(topNode, tower_node_name.c_str());
+  auto * tic = findNode::getClass<TowerInfoContainer>(topNode, tower_node_name);
   if (!tic)
   {
     std::cout << "DetermineTowerBackgroundv1::LoadTowerInfoContainer - cannot find " << tower_node_name << ", exiting" << std::endl;
@@ -327,7 +328,7 @@ TowerInfoContainer * DetermineTowerBackgroundv1::LoadTowerInfoContainer(PHCompos
 
 RawTowerGeomContainer * DetermineTowerBackgroundv1::LoadTowerGeomContainer(PHCompositeNode *topNode, const std::string &tower_geom_node_name)
 {
-  auto * tg = findNode::getClass<RawTowerGeomContainer>(topNode, tower_geom_node_name.c_str());
+  auto * tg = findNode::getClass<RawTowerGeomContainer>(topNode, tower_geom_node_name);
   if (!tg)
   {
     std::cout << "DetermineTowerBackgroundv1::LoadTowerGeomContainer - cannot find " << tower_geom_node_name << ", exiting" << std::endl;
@@ -750,9 +751,9 @@ int DetermineTowerBackgroundv1::init_event(PHCompositeNode *topNode)
       std::cout << "DetermineTowerBackgroundv1::init_event - first event, initializing energy vectors and binning" << std::endl;
     }
 
-    auto * rtgc_ihcal = findNode::getClass<RawTowerGeomContainer>(topNode, m_ihcal_geom_node.c_str());
-    auto * rtgc_ohcal = findNode::getClass<RawTowerGeomContainer>(topNode, m_ohcal_geom_node.c_str());
-    auto * rtgc_cemc  = findNode::getClass<RawTowerGeomContainer>(topNode, m_cemc_geom_node.c_str());
+    auto * rtgc_ihcal = findNode::getClass<RawTowerGeomContainer>(topNode, m_ihcal_geom_node);
+    auto * rtgc_ohcal = findNode::getClass<RawTowerGeomContainer>(topNode, m_ohcal_geom_node);
+    auto * rtgc_cemc  = findNode::getClass<RawTowerGeomContainer>(topNode, m_cemc_geom_node);
 
     m_num_eta_ihcal = rtgc_ihcal -> get_etabins();
     m_num_phi_ihcal = rtgc_ihcal -> get_phibins();
@@ -856,7 +857,7 @@ int DetermineTowerBackgroundv1::process_event(PHCompositeNode *topNode)
   // target geometry
   m_ihcal_geom = LoadTowerGeomContainer(topNode, m_ihcal_geom_node);
 
-  auto * ktjets = findNode::getClass<JetContainer>(topNode, m_seed_jet_name.c_str() );
+  auto * ktjets = findNode::getClass<JetContainer>(topNode, m_seed_jet_name);
   if ( !ktjets )
   {
     std::cout << "DetermineTowerBackgroundv1::process_event - cannot find " << m_seed_jet_name << ", exiting" << std::endl;
@@ -883,7 +884,7 @@ int DetermineTowerBackgroundv1::process_event(PHCompositeNode *topNode)
   for ( size_t i = 0; i < ktjets -> size(); i++ )
   {
 
-    auto this_jet = ktjets -> get_jet(i);
+    auto* this_jet = ktjets -> get_jet(i);
     if ( !this_jet )
     {
       continue;
@@ -894,8 +895,11 @@ int DetermineTowerBackgroundv1::process_event(PHCompositeNode *topNode)
 
     double seed_pt = 0.0;
     // auto this_pt  = this_jet -> get_pt();
-    double fj_px = 0, fj_py = 0, fj_pz = 0, fj_e = 0;
-    
+    double fj_px = 0;
+    double fj_py = 0;
+    double fj_pz = 0;
+    double fj_e = 0;
+
     for ( const auto & comp : this_jet -> get_comp_vec() )
     {
 
@@ -1001,8 +1005,7 @@ int DetermineTowerBackgroundv1::process_event(PHCompositeNode *topNode)
       std::cout << "DetermineTowerBackgroundv1::process_event: --> jet has value = " << seed_pt << std::endl;
     }
 
-    seed_val_pairs.push_back( std::make_pair(i, seed_pt) );
-  
+    seed_val_pairs.emplace_back(i, seed_pt);
   }
 
   // accepted seeds
@@ -1028,7 +1031,7 @@ int DetermineTowerBackgroundv1::process_event(PHCompositeNode *topNode)
   int n_accepted_seeds = 0;
   for ( const auto & i : accepted_seed_indices )
   {
-    auto this_jet = ktjets -> get_jet( i );
+    auto* this_jet = ktjets -> get_jet( i );
     assert(this_jet);
 
     // double val = 0; 
@@ -1353,7 +1356,9 @@ int DetermineTowerBackgroundv1::process_event(PHCompositeNode *topNode)
   float avg_avg_emcal_energy = 0.0;
   float avg_avg_ihcal_energy = 0.0;
   float avg_avg_ohcal_energy = 0.0;
-  int n_eta_emcal = 0, n_eta_ihcal = 0, n_eta_ohcal = 0;
+  int n_eta_emcal = 0;
+  int n_eta_ihcal = 0;
+  int n_eta_ohcal = 0;
   for (int ieta = 0; ieta < m_num_eta_ihcal; ieta++ )
   {
     if ( n_emcal_towers_eta.at(ieta) > 0 )
@@ -1516,7 +1521,9 @@ int DetermineTowerBackgroundv1::process_event(PHCompositeNode *topNode)
   // }
 
   // get rho values
-  double rho_emcal = 0.0, rho_ihcal = 0.0, rho_ohcal = 0.0;
+  double rho_emcal = 0.0;
+  double rho_ihcal = 0.0;
+  double rho_ohcal = 0.0;
   auto * tr_cemc = findNode::getClass<TowerRhov1>(topNode, m_cemc_rho_node);
   if ( !tr_cemc )
   {

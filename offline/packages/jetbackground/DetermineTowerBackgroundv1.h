@@ -29,8 +29,13 @@ class DetermineTowerBackgroundv1 : public SubsysReco
   enum FlowMode { NoFlow = 0, EBE = 1, AVG = 2};
   enum Psi2Mode { NoPsi2 = 0, Calo = 1, Truth = 2, sEPD = 3 };
 
-  DetermineTowerBackgroundv1(const std::string &name = "DetermineTowerBackgroundv1");
+  explicit DetermineTowerBackgroundv1(const std::string &name = "DetermineTowerBackgroundv1");
   ~DetermineTowerBackgroundv1() override;
+
+  DetermineTowerBackgroundv1(const DetermineTowerBackgroundv1 &) = delete;
+  DetermineTowerBackgroundv1 &operator=(const DetermineTowerBackgroundv1 &) = delete;
+  DetermineTowerBackgroundv1(DetermineTowerBackgroundv1 &&) = delete;
+  DetermineTowerBackgroundv1 &operator=(DetermineTowerBackgroundv1 &&) = delete;
 
   int InitRun(PHCompositeNode *topNode) override;
   int process_event(PHCompositeNode *topNode) override;
@@ -98,16 +103,16 @@ class DetermineTowerBackgroundv1 : public SubsysReco
 
   int LoadEtaCalib();
   int grab_mbdQ(PHCompositeNode *topNode);
-  float get_etaWeight(const int layer_index, const int ieta) const;
-  static int find_bin(const float val, const std::vector<float> &edges);
+  float get_etaWeight(int layer_index, int ieta) const;
+  static int find_bin(float val, const std::vector<float> &edges);
   static int encode_channel(const int ieta, const int izbin, const int imbd, const int n_mbd_bins)
   {
     return izbin * (n_mbd_bins * m_calib_n_eta_expected) + imbd * m_calib_n_eta_expected + ieta;
   }
 
   std::string m_background_node       = "TestTowerBackground";
-  std::string m_seed_jet_name {""};
-  std::string m_overwrite_average_calo_v2_path {""};
+  std::string m_seed_jet_name;
+  std::string m_overwrite_average_calo_v2_path;
 
   int m_flow_mode = FlowMode::NoFlow;
   int m_psi2_mode = Psi2Mode::sEPD;
@@ -119,7 +124,7 @@ class DetermineTowerBackgroundv1 : public SubsysReco
   // float m_seed_max_const{3.0};
   // float m_seed_jet_pt = 5.0;
   
-  std::vector<float> m_cent_avg_v2 {};
+  std::vector<float> m_cent_avg_v2;
 
   bool m_is_flow_failure = false;
   float m_v2    = 0;
@@ -135,23 +140,23 @@ class DetermineTowerBackgroundv1 : public SubsysReco
   int m_num_eta_ihcal = 0;
   int m_num_phi_ihcal = 0;
 
-  std::vector<std::vector<float>> m_emcal_energy {};
-  std::vector<std::vector<float>> m_ihcal_energy {};
-  std::vector<std::vector<float>> m_ohcal_energy {};
+  std::vector<std::vector<float>> m_emcal_energy;
+  std::vector<std::vector<float>> m_ihcal_energy;
+  std::vector<std::vector<float>> m_ohcal_energy;
   
-  std::vector<std::vector<bool>> m_emcal_mask {};
-  std::vector<std::vector<bool>> m_ihcal_mask {};
-  std::vector<std::vector<bool>> m_ohcal_mask {};
+  std::vector<std::vector<bool>> m_emcal_mask;
+  std::vector<std::vector<bool>> m_ihcal_mask;
+  std::vector<std::vector<bool>> m_ohcal_mask;
 
-  std::vector<std::vector<bool>> m_emcal_flow_mask {};
-  std::vector<std::vector<bool>> m_ihcal_flow_mask {};
-  std::vector<std::vector<bool>> m_ohcal_flow_mask {};
+  std::vector<std::vector<bool>> m_emcal_flow_mask;
+  std::vector<std::vector<bool>> m_ihcal_flow_mask;
+  std::vector<std::vector<bool>> m_ohcal_flow_mask;
 
-  std::vector<float> m_emcal_tower_eta {};
-  std::vector<float> m_ihcal_tower_eta {};
-  std::vector<float> m_ohcal_tower_eta {};
+  std::vector<float> m_emcal_tower_eta;
+  std::vector<float> m_ihcal_tower_eta;
+  std::vector<float> m_ohcal_tower_eta;
 
-  std::vector<std::vector<float>> m_ue_density {};
+  std::vector<std::vector<float>> m_ue_density;
 
   // bool  m_exclude_full_eta_flow_strips = true; // if true, require full phi coverage in strip to use for flow extraction, otherwise just exclude towers with no hits
   // float m_min_tower_energy   = -999.0;
@@ -190,7 +195,7 @@ class DetermineTowerBackgroundv1 : public SubsysReco
   bool m_use_etaCalib = false;
   bool m_etaCalib_loaded = false;
   std::string m_calib_direct_path = "/sphenix/user/tmengel/JetUESub-JSTG-TF03/calibrations/rho_plots_data/rho_eta_calib_cdb.root";
-  std::string m_calib_cdb_tag = "";
+  std::string m_calib_cdb_tag;
   std::string m_mbd_node = "MbdOut";
   float m_mbdQ = 0.0;
 
@@ -198,8 +203,8 @@ class DetermineTowerBackgroundv1 : public SubsysReco
   CDBTTree * m_calib_tree = nullptr;
   int m_calib_izbin = -1;
   int m_calib_imbd = -1;
-  std::vector<float> m_calib_zvtx_edges {};
-  std::vector<float> m_calib_mbdQ_edges {};
+  std::vector<float> m_calib_zvtx_edges;
+  std::vector<float> m_calib_mbdQ_edges;
   static const std::vector<std::string> m_calib_layer_names;
 
 };
