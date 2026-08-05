@@ -45,6 +45,7 @@ class SubtractTowers : public SubsysReco
   {
     m_towerBackgroundNode = nodeName;
   }
+  void SetOutputNodeSuffix(const std::string &suffix) { m_outputNodeSuffix = suffix; }
 
  private:
   int CreateNode(PHCompositeNode *topNode);
@@ -53,6 +54,7 @@ class SubtractTowers : public SubsysReco
   bool _use_flow_modulation{false};
   std::string m_towerNodePrefix{"TOWERINFO_CALIB"};
   std::string m_towerBackgroundNode{"TowerInfoBackground_Sub2"};
+  std::string m_outputNodeSuffix{"_SUB1"};
   std::string EMTowerName;
   std::string IHTowerName;
   std::string OHTowerName;
