@@ -101,13 +101,13 @@ int SubtractTowers::process_event(PHCompositeNode *topNode)
   TowerInfoContainer *ohcal_towerinfos = nullptr;
   if (m_use_towerinfo)
   {
-    EMTowerName = m_towerNodePrefix + "_CEMC_RETOWER_SUB1";
-    IHTowerName = m_towerNodePrefix + "_HCALIN_SUB1";
-    OHTowerName = m_towerNodePrefix + "_HCALOUT_SUB1";
+    EMTowerName = m_towerNodePrefix + "_CEMC_RETOWER" + m_outputNodeSuffix;
+    IHTowerName = m_towerNodePrefix + "_HCALIN" + m_outputNodeSuffix;
+    OHTowerName = m_towerNodePrefix + "_HCALOUT" + m_outputNodeSuffix;
     emcal_towerinfos = findNode::getClass<TowerInfoContainer>(topNode, EMTowerName);
     ihcal_towerinfos = findNode::getClass<TowerInfoContainer>(topNode, IHTowerName);
     ohcal_towerinfos = findNode::getClass<TowerInfoContainer>(topNode, OHTowerName);
-  
+
     if (Verbosity() > 0)
       {
 	std::cout << "SubtractTowers::process_event: starting with " << emcal_towerinfos->size() << EMTowerName << " towers" << std::endl;
@@ -118,14 +118,14 @@ int SubtractTowers::process_event(PHCompositeNode *topNode)
 
   else
   {
-    emcal_towers = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_CEMC_RETOWER_SUB1");
-    ihcal_towers = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_HCALIN_SUB1");
-    ohcal_towers = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_HCALOUT_SUB1");
+    emcal_towers = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_CEMC_RETOWER" + m_outputNodeSuffix);
+    ihcal_towers = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_HCALIN" + m_outputNodeSuffix);
+    ohcal_towers = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_HCALOUT" + m_outputNodeSuffix);
     if (Verbosity() > 0)
     {
-      std::cout << "SubtractTowers::process_event: starting with " << emcal_towers->size() << " TOWER_CALIB_CEMC_RETOWER_SUB1 towers" << std::endl;
-      std::cout << "SubtractTowers::process_event: starting with " << ihcal_towers->size() << " TOWER_CALIB_HCALIN_SUB1 towers" << std::endl;
-      std::cout << "SubtractTowers::process_event: starting with " << ohcal_towers->size() << " TOWER_CALIB_HCALOUT_SUB1 towers" << std::endl;
+      std::cout << "SubtractTowers::process_event: starting with " << emcal_towers->size() << " TOWER_CALIB_CEMC_RETOWER" << m_outputNodeSuffix << " towers" << std::endl;
+      std::cout << "SubtractTowers::process_event: starting with " << ihcal_towers->size() << " TOWER_CALIB_HCALIN" << m_outputNodeSuffix << " towers" << std::endl;
+      std::cout << "SubtractTowers::process_event: starting with " << ohcal_towers->size() << " TOWER_CALIB_HCALOUT" << m_outputNodeSuffix << " towers" << std::endl;
     }
   }
 
@@ -418,15 +418,15 @@ int SubtractTowers::process_event(PHCompositeNode *topNode)
   {
     if (!m_use_towerinfo)
     {
-      std::cout << "SubtractTowers::process_event: ending with " << emcal_towers->size() << " TOWER_CALIB_CEMC_RETOWER_SUB1 towers" << std::endl;
-      std::cout << "SubtractTowers::process_event: ending with " << ihcal_towers->size() << " TOWER_CALIB_HCALIN_SUB1 towers" << std::endl;
-      std::cout << "SubtractTowers::process_event: ending with " << ohcal_towers->size() << " TOWER_CALIB_HCALOUT_SUB1 towers" << std::endl;
+      std::cout << "SubtractTowers::process_event: ending with " << emcal_towers->size() << " TOWER_CALIB_CEMC_RETOWER" << m_outputNodeSuffix << " towers" << std::endl;
+      std::cout << "SubtractTowers::process_event: ending with " << ihcal_towers->size() << " TOWER_CALIB_HCALIN" << m_outputNodeSuffix << " towers" << std::endl;
+      std::cout << "SubtractTowers::process_event: ending with " << ohcal_towers->size() << " TOWER_CALIB_HCALOUT" << m_outputNodeSuffix << " towers" << std::endl;
     }
     else
     {
-      std::cout << "SubtractTowers::process_event: ending with " << emcal_towerinfos->size() << m_towerNodePrefix << "_CEMC_RETOWER_SUB1 towers" << std::endl;
-      std::cout << "SubtractTowers::process_event: ending with " << ihcal_towerinfos->size() << m_towerNodePrefix << "_HCALIN_SUB1 towers" << std::endl;
-      std::cout << "SubtractTowers::process_event: ending with " << ohcal_towerinfos->size() << m_towerNodePrefix << "_HCALOUT_SUB1 towers" << std::endl;
+      std::cout << "SubtractTowers::process_event: ending with " << emcal_towerinfos->size() << m_towerNodePrefix << "_CEMC_RETOWER" << m_outputNodeSuffix << " towers" << std::endl;
+      std::cout << "SubtractTowers::process_event: ending with " << ihcal_towerinfos->size() << m_towerNodePrefix << "_HCALIN" << m_outputNodeSuffix << " towers" << std::endl;
+      std::cout << "SubtractTowers::process_event: ending with " << ohcal_towerinfos->size() << m_towerNodePrefix << "_HCALOUT" << m_outputNodeSuffix << " towers" << std::endl;
     }
   }
 
@@ -467,7 +467,7 @@ int SubtractTowers::CreateNode(PHCompositeNode *topNode)
   }
   if (m_use_towerinfo)
   {
-    EMTowerName = m_towerNodePrefix + "_CEMC_RETOWER_SUB1";
+    EMTowerName = m_towerNodePrefix + "_CEMC_RETOWER" + m_outputNodeSuffix;
     TowerInfoContainer *test_emcal_tower = findNode::getClass<TowerInfoContainer>(topNode, EMTowerName);
     if (!test_emcal_tower)
     {
@@ -487,21 +487,21 @@ int SubtractTowers::CreateNode(PHCompositeNode *topNode)
   }
   else
   {
-    RawTowerContainer *test_emcal_tower = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_CEMC_RETOWER_SUB1");
+    RawTowerContainer *test_emcal_tower = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_CEMC_RETOWER" + m_outputNodeSuffix);
     if (!test_emcal_tower)
     {
       if (Verbosity() > 0)
       {
-        std::cout << "SubtractTowers::CreateNode : creating TOWER_CALIB_CEMC_RETOWER_SUB1 node " << std::endl;
+        std::cout << "SubtractTowers::CreateNode : creating TOWER_CALIB_CEMC_RETOWER" << m_outputNodeSuffix << " node " << std::endl;
       }
 
       RawTowerContainer *emcal_towers = new RawTowerContainer(RawTowerDefs::CalorimeterId::HCALIN);
-      PHIODataNode<PHObject> *emcalTowerNode = new PHIODataNode<PHObject>(emcal_towers, "TOWER_CALIB_CEMC_RETOWER_SUB1", "PHObject");
+      PHIODataNode<PHObject> *emcalTowerNode = new PHIODataNode<PHObject>(emcal_towers, "TOWER_CALIB_CEMC_RETOWER" + m_outputNodeSuffix, "PHObject");
       emcalNode->addNode(emcalTowerNode);
     }
     else
     {
-      std::cout << "SubtractTowers::CreateNode : TOWER_CALIB_CEMC_RETOWER_SUB1 already exists! " << std::endl;
+      std::cout << "SubtractTowers::CreateNode : TOWER_CALIB_CEMC_RETOWER" << m_outputNodeSuffix << " already exists! " << std::endl;
     }
   }
 
@@ -513,7 +513,7 @@ int SubtractTowers::CreateNode(PHCompositeNode *topNode)
   }
   if (m_use_towerinfo)
   {
-    IHTowerName = m_towerNodePrefix + "_HCALIN_SUB1";
+    IHTowerName = m_towerNodePrefix + "_HCALIN" + m_outputNodeSuffix;
     TowerInfoContainer *test_ihcal_tower = findNode::getClass<TowerInfoContainer>(topNode, IHTowerName);
     if (!test_ihcal_tower)
     {
@@ -533,21 +533,21 @@ int SubtractTowers::CreateNode(PHCompositeNode *topNode)
   }
   else
   {
-    RawTowerContainer *test_ihcal_tower = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_HCALIN_SUB1");
+    RawTowerContainer *test_ihcal_tower = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_HCALIN" + m_outputNodeSuffix);
     if (!test_ihcal_tower)
     {
       if (Verbosity() > 0)
       {
-        std::cout << "SubtractTowers::CreateNode : creating TOWER_CALIB_HCALIN_SUB1 node " << std::endl;
+        std::cout << "SubtractTowers::CreateNode : creating TOWER_CALIB_HCALIN" << m_outputNodeSuffix << " node " << std::endl;
       }
 
       RawTowerContainer *ihcal_towers = new RawTowerContainer(RawTowerDefs::CalorimeterId::HCALIN);
-      PHIODataNode<PHObject> *ihcalTowerNode = new PHIODataNode<PHObject>(ihcal_towers, "TOWER_CALIB_HCALIN_SUB1", "PHObject");
+      PHIODataNode<PHObject> *ihcalTowerNode = new PHIODataNode<PHObject>(ihcal_towers, "TOWER_CALIB_HCALIN" + m_outputNodeSuffix, "PHObject");
       ihcalNode->addNode(ihcalTowerNode);
     }
     else
     {
-      std::cout << "SubtractTowers::CreateNode : TOWER_CALIB_HCALIN_SUB1 already exists! " << std::endl;
+      std::cout << "SubtractTowers::CreateNode : TOWER_CALIB_HCALIN" << m_outputNodeSuffix << " already exists! " << std::endl;
     }
   }
 
@@ -559,7 +559,7 @@ int SubtractTowers::CreateNode(PHCompositeNode *topNode)
   }
   if (m_use_towerinfo)
   {
-    OHTowerName = m_towerNodePrefix + "_HCALOUT_SUB1";
+    OHTowerName = m_towerNodePrefix + "_HCALOUT" + m_outputNodeSuffix;
     TowerInfoContainer *test_ohcal_tower = findNode::getClass<TowerInfoContainer>(topNode, OHTowerName);
     if (!test_ohcal_tower)
     {
@@ -579,21 +579,21 @@ int SubtractTowers::CreateNode(PHCompositeNode *topNode)
   }
   else
   {
-    RawTowerContainer *test_ohcal_tower = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_HCALOUT_SUB1");
+    RawTowerContainer *test_ohcal_tower = findNode::getClass<RawTowerContainer>(topNode, "TOWER_CALIB_HCALOUT" + m_outputNodeSuffix);
     if (!test_ohcal_tower)
     {
       if (Verbosity() > 0)
       {
-        std::cout << "SubtractTowers::CreateNode : creating TOWER_CALIB_HCALOUT_SUB1 node " << std::endl;
+        std::cout << "SubtractTowers::CreateNode : creating TOWER_CALIB_HCALOUT" << m_outputNodeSuffix << " node " << std::endl;
       }
 
       RawTowerContainer *ohcal_towers = new RawTowerContainer(RawTowerDefs::CalorimeterId::HCALOUT);
-      PHIODataNode<PHObject> *ohcalTowerNode = new PHIODataNode<PHObject>(ohcal_towers, "TOWER_CALIB_HCALOUT_SUB1", "PHObject");
+      PHIODataNode<PHObject> *ohcalTowerNode = new PHIODataNode<PHObject>(ohcal_towers, "TOWER_CALIB_HCALOUT" + m_outputNodeSuffix, "PHObject");
       ohcalNode->addNode(ohcalTowerNode);
     }
     else
     {
-      std::cout << "SubtractTowers::CreateNode : TOWER_CALIB_HCALOUT_SUB1 already exists! " << std::endl;
+      std::cout << "SubtractTowers::CreateNode : TOWER_CALIB_HCALOUT" << m_outputNodeSuffix << " already exists! " << std::endl;
     }
   }
   return Fun4AllReturnCodes::EVENT_OK;
