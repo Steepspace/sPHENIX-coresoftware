@@ -38,8 +38,17 @@ class SubtractTowers : public SubsysReco
   }
   void set_towerNodePrefix(const std::string &prefix)
   {
-    m_towerNodePrefix = prefix;
+    m_inputNodePrefix = prefix;
+    m_outputNodePrefix = prefix;
     return;
+  }
+  void set_inputNodePrefix(const std::string &prefix)
+  {
+    m_inputNodePrefix = prefix;
+  }
+  void set_outputNodePrefix(const std::string &prefix)
+  {
+    m_outputNodePrefix = prefix;
   }
   void set_inputTowerBackgroundNode( const std::string &nodeName )
   {
@@ -52,7 +61,8 @@ class SubtractTowers : public SubsysReco
 
   bool m_use_towerinfo{false};
   bool _use_flow_modulation{false};
-  std::string m_towerNodePrefix{"TOWERINFO_CALIB"};
+  std::string m_inputNodePrefix{"TOWERINFO_CALIB"};
+  std::string m_outputNodePrefix{"TOWERINFO_CALIB"};
   std::string m_towerBackgroundNode{"TowerInfoBackground_Sub2"};
   std::string m_outputNodeSuffix{"_SUB1"};
   std::string EMTowerName;
