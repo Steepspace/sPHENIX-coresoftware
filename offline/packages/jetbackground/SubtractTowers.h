@@ -25,8 +25,13 @@ class PHCompositeNode;
 class SubtractTowers : public SubsysReco
 {
  public:
-  SubtractTowers(const std::string &name = "SubtractTowers");
-  ~SubtractTowers() override {}
+  explicit SubtractTowers(const std::string &name = "SubtractTowers");
+  ~SubtractTowers() override = default;
+
+  SubtractTowers(const SubtractTowers &) = delete;
+  SubtractTowers &operator=(const SubtractTowers &) = delete;
+  SubtractTowers(SubtractTowers &&) = delete;
+  SubtractTowers &operator=(SubtractTowers &&) = delete;
 
   int InitRun(PHCompositeNode *topNode) override;
   int process_event(PHCompositeNode *topNode) override;
