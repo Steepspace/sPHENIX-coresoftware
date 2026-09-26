@@ -99,7 +99,6 @@ class DetermineTowerBackgroundv1 : public SubsysReco
   int get_psi2(PHCompositeNode *topNode);
   int get_v2(PHCompositeNode *topNode);
   int LoadCalibrations();
-  int fill_energy_vectors(PHCompositeNode *topNode, Jet::SRC src);
 
   int LoadEtaCalib();
   int grab_mbdQ(PHCompositeNode *topNode);
