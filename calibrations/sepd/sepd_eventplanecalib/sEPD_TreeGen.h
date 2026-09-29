@@ -117,8 +117,6 @@ class sEPD_TreeGen : public SubsysReco
 
   int m_event{0};
 
-  static constexpr int PROGRESS_PRINT_INTERVAL = 20;
-
   // Cuts
   struct Cuts
   {

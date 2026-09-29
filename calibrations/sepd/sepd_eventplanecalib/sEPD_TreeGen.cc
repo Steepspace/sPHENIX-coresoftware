@@ -294,10 +294,6 @@ int sEPD_TreeGen::process_event(PHCompositeNode *topNode)
 
   m_data.event_id = eventInfo->get_EvtSequence();
 
-  if (Verbosity() && m_event % PROGRESS_PRINT_INTERVAL == 0)
-  {
-    std::cout << "Progress: " << m_event << ", Global: " << m_data.event_id << std::endl;
-  }
   ++m_event;
 
   m_evtdata = findNode::getClass<EventPlaneData>(topNode, "EventPlaneData");
