@@ -12,6 +12,7 @@
 
 // -- MB
 #include <calotrigger/MinimumBiasInfo.h>
+#include <calotrigger/TriggerAnalyzer.h>
 
 #include <centrality/CentralityInfo.h>
 
@@ -52,6 +53,9 @@ int sEPD_TreeGen::Init(PHCompositeNode *topNode)
   {
     se->Print("NODETREE");
   }
+
+  m_triggerAnalyzer = std::make_unique<TriggerAnalyzer>();
+
   unsigned int bins_sepd_totalcharge{100};
   double sepd_totalcharge_low{0};
   double sepd_totalcharge_high{2e4};
@@ -121,8 +125,17 @@ int sEPD_TreeGen::process_event_check(PHCompositeNode *topNode)
     return Fun4AllReturnCodes::ABORTRUN;
   }
 
+  // MBD Trigger
+  m_triggerAnalyzer->decodeTriggers(topNode);
+
+  bool didTrig14Fire = m_triggerAnalyzer->didTriggerFire(m_trig_14);
+  bool didTrig12Fire = m_triggerAnalyzer->didTriggerFire(m_trig_12);
+
+  bool mbd_trigger_fire = didTrig12Fire || didTrig14Fire;
+  bool pass_MB = mbd_trigger_fire && m_mb_info->isAuAuMinimumBias();
+
   // skip event if not minimum bias
-  if (!m_mb_info->isAuAuMinimumBias())
+  if (!pass_MB)
   {
     if (Verbosity() > 1)
     {

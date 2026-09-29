@@ -6,7 +6,9 @@
 
 // -- c++
 #include <string>
+#include <memory>
 
+class TriggerAnalyzer;
 class EventPlaneData;
 class PHCompositeNode;
 class TH2;
@@ -117,11 +119,16 @@ class sEPD_TreeGen : public SubsysReco
 
   int m_event{0};
 
+  const int m_trig_12 = 12; // MBD N&S >= 2, vtx < 10 cm
+  const int m_trig_14 = 14; // MBD N&S >= 2, vtx < 150 cm
+
+  std::unique_ptr<TriggerAnalyzer> m_triggerAnalyzer;
+
   // Cuts
   struct Cuts
   {
     double m_zvtx_max{10}; /*cm*/
-    double m_sepd_charge_min{0.2};
+    double m_sepd_charge_min{0.5};
     double m_cent_max{80};
   };
 
