@@ -257,6 +257,13 @@ void GenStatus::histToCaloCDBTree(const std::string &outputfile, const std::stri
         key = TowerInfoDefs::encode_hcal(ie, ip);
       }
       float val = hist->GetBinContent(ie + 1, ip + 1);
+      // CaloFittingQA stores <E_ZS / E_template>. Since CaloTowerCalib multiplies
+      // raw ZS amplitude by this factor (E_calib = E_raw * calib * crosscalib),
+      // store the inverse (E_template / E_ZS) to scale back to template-fit energy.
+      if (fieldName == "ratio")
+      {
+        val = (val > 0.0F) ? (1.0F / val) : 1.0F;
+      }
       cdbttree->SetFloatValue(key, fieldName, val);
       mean += val;
       count++;
