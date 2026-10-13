@@ -44,6 +44,7 @@ pkginclude_HEADERS = \
   BaseBeamBackgroundFilter.h \
   CopyAndSubtractJets.h \
   DetermineTowerBackground.h \
+  DetermineTowerBackgroundv1.h \
   DetermineEventRho.h \
   DetermineTowerRho.h \
   EventRho.h \
@@ -53,6 +54,7 @@ pkginclude_HEADERS = \
   MbdChargeKnee.h \
   NullFilter.h \
   RetowerCEMC.h \
+  RhoUEProfile.h \
   StreakSidebandFilter.h \
   SubtractTowers.h \
   SubtractTowersCS.h \
@@ -85,6 +87,7 @@ libjetbackground_la_SOURCES = \
   BeamBackgroundFilterAndQA.cc \
   CopyAndSubtractJets.cc \
   DetermineTowerBackground.cc \
+  DetermineTowerBackgroundv1.cc \
   DetermineEventRho.cc \
   DetermineTowerRho.cc \
   FastJetAlgoSub.cc \
