@@ -50,6 +50,7 @@ class SubtractTowers : public SubsysReco
   void set_ohcal_geom_node(const std::string &name) { m_ohcal_geom_node = name; }
   // output tower nodes; empty (default) means
   // m_towerNodePrefix + "_CEMC_RETOWER_SUB1" / "_HCALIN_SUB1" / "_HCALOUT_SUB1"
+  // (prefix and suffix overridable with set_outputNodePrefix / SetOutputNodeSuffix)
   void set_emcal_output_node(const std::string &name) { m_emcal_output_node = name; }
   void set_ihcal_output_node(const std::string &name) { m_ihcal_output_node = name; }
   void set_ohcal_output_node(const std::string &name) { m_ohcal_output_node = name; }
@@ -57,6 +58,17 @@ class SubtractTowers : public SubsysReco
   {
     m_towerBackgroundNode = nodeName;
   }
+
+  // compatibility with the pre-jstgtf03 jetbackground setters, so existing
+  // macros work unchanged; per-layer node setters above take precedence
+  void set_inputNodePrefix(const std::string &prefix)
+  {
+    m_emcal_input_node = prefix + "_CEMC_RETOWER";
+    m_ihcal_input_node = prefix + "_HCALIN";
+    m_ohcal_input_node = prefix + "_HCALOUT";
+  }
+  void set_outputNodePrefix(const std::string &prefix) { m_outputNodePrefix = prefix; }
+  void SetOutputNodeSuffix(const std::string &suffix) { m_outputNodeSuffix = suffix; }
 
  private:
   int CreateNode(PHCompositeNode *topNode);
@@ -75,9 +87,12 @@ class SubtractTowers : public SubsysReco
   std::string m_emcal_output_node;
   std::string m_ihcal_output_node;
   std::string m_ohcal_output_node;
-  std::string emcal_output_node() const { return m_emcal_output_node.empty() ? m_towerNodePrefix + "_CEMC_RETOWER_SUB1" : m_emcal_output_node; }
-  std::string ihcal_output_node() const { return m_ihcal_output_node.empty() ? m_towerNodePrefix + "_HCALIN_SUB1" : m_ihcal_output_node; }
-  std::string ohcal_output_node() const { return m_ohcal_output_node.empty() ? m_towerNodePrefix + "_HCALOUT_SUB1" : m_ohcal_output_node; }
+  std::string m_outputNodePrefix;  // empty = m_towerNodePrefix
+  std::string m_outputNodeSuffix{"_SUB1"};
+  std::string output_prefix() const { return m_outputNodePrefix.empty() ? m_towerNodePrefix : m_outputNodePrefix; }
+  std::string emcal_output_node() const { return m_emcal_output_node.empty() ? output_prefix() + "_CEMC_RETOWER" + m_outputNodeSuffix : m_emcal_output_node; }
+  std::string ihcal_output_node() const { return m_ihcal_output_node.empty() ? output_prefix() + "_HCALIN" + m_outputNodeSuffix : m_ihcal_output_node; }
+  std::string ohcal_output_node() const { return m_ohcal_output_node.empty() ? output_prefix() + "_HCALOUT" + m_outputNodeSuffix : m_ohcal_output_node; }
   std::string EMTowerName;
   std::string IHTowerName;
   std::string OHTowerName;
